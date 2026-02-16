@@ -327,45 +327,47 @@ GAI/
 
 ## 구현 상태
 
-### ✅ 완전 구현
+> ⚠️ **중요**: 모든 코드는 **초안/미완성 상태**입니다. 완전히 구현되거나 테스트된 기능은 하나도 없습니다.
 
-#### 코어 시스템
-- [x] 타입 시스템 (43개 exported types)
-- [x] Agent (에이전트 루프, 최대 10회 반복)
-- [x] ToolRegistry (도구 관리 시스템)
+### 🚧 초안 작성됨 (미완성)
 
-#### LLM 시스템
-- [x] LLMManager (멀티모드 관리)
-- [x] AnthropicLLM (도구 호출 지원)
-- [x] OpenAILLM (도구 호출 지원)
-- [x] GoogleLLM (텍스트만)
-- [x] OllamaLLM (텍스트만)
-- [x] Provider-native history management
+#### 코어 시스템 (초안)
+- [ ] 타입 시스템 (43개 exported types) - 초안
+- [ ] Agent (에이전트 루프, 최대 10회 반복) - 초안
+- [ ] ToolRegistry (도구 관리 시스템) - 초안
 
-#### 네비게이션 브레인 ⭐
-- [x] NavigationBrain (경로 학습 및 실행)
-- [x] VLMAnalyzer (화면 분석)
-- [x] StateHasher (상태 해싱)
-- [x] JSONStorage (영속성)
+#### LLM 시스템 (초안)
+- [ ] LLMManager (멀티모드 관리) - 초안
+- [ ] AnthropicLLM (도구 호출 지원) - 초안
+- [ ] OpenAILLM (도구 호출 지원) - 초안
+- [ ] GoogleLLM (텍스트만) - 초안
+- [ ] OllamaLLM (텍스트만) - 초안
+- [ ] Provider-native history management - 초안
 
-#### GUI 도구 (12개)
-- [x] Vision Tools (4개): SmartScreenReader, ScreenCapture, OCR, ScreenReader
-- [x] Action Tools (5개): Click, Type, KeyPress, TabNavigate, Spotlight
-- [x] Brain Tools (3개): NavigateTo, GetCurrentNode, LaunchApp
+#### 네비게이션 브레인 (초안)
+- [ ] NavigationBrain (경로 학습 및 실행) - 초안
+- [ ] VLMAnalyzer (화면 분석) - 초안
+- [ ] StateHasher (상태 해싱) - 초안
+- [ ] JSONStorage (영속성) - 초안
 
-#### 설정 및 유틸리티
-- [x] ConfigLoader (3계층 설정)
-- [x] MouseController (마우스 자동화)
-- [x] KeyboardController (키보드 자동화)
-- [x] MacOCRProvider (macOS Vision Framework)
-- [x] MacPermissions (권한 관리)
+#### GUI 도구 (초안, 12개)
+- [ ] Vision Tools (4개): SmartScreenReader, ScreenCapture, OCR, ScreenReader - 초안
+- [ ] Action Tools (5개): Click, Type, KeyPress, TabNavigate, Spotlight - 초안
+- [ ] Brain Tools (3개): NavigateTo, GetCurrentNode, LaunchApp - 초안
 
-#### 플랫폼 지원
-- [x] macOS (완전 지원)
+#### 설정 및 유틸리티 (초안)
+- [ ] ConfigLoader (3계층 설정) - 초안
+- [ ] MouseController (마우스 자동화) - 초안
+- [ ] KeyboardController (키보드 자동화) - 초안
+- [ ] MacOCRProvider (macOS Vision Framework) - 초안
+- [ ] MacPermissions (권한 관리) - 초안
 
-### 🚧 미완성 / 개발 예정
+#### 플랫폼 지원 (초안)
+- [ ] macOS (부분 지원) - 초안
 
-> ⚠️ **주의**: 아래 기능들은 아직 구현되지 않았습니다.
+### ❌ 미구현 (시작하지 않음)
+
+> ⚠️ **주의**: 아래 기능들은 아직 시작조차 하지 않았습니다.
 
 #### 높은 우선순위
 - [ ] **테스트 코드** (유닛 테스트, 통합 테스트)
