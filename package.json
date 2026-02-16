@@ -8,7 +8,10 @@
     "dev": "tsx src/index.ts",
     "build": "vite build",
     "start": "node dist/index.js",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
   "repository": {
     "type": "git",
@@ -22,18 +25,25 @@
   },
   "homepage": "https://github.com/0su0su0/GAI#readme",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.2.3",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
     "eslint": "^9.39.2",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
+    "@cherrystudio/mac-system-ocr": "^0.2.7",
     "@google/generative-ai": "^0.24.1",
+    "@nut-tree-fork/nut-js": "^4.2.6",
     "dotenv": "^17.3.1",
+    "node-mac-permissions": "^2.5.0",
+    "node-screenshots": "^0.2.8",
     "openai": "^6.21.0"
   }
 }

@@ -7,3 +7,6 @@ dist
 config/config.json
 config/.env
 .env
+
+# Brain data (learned navigation paths)
+data/brain/

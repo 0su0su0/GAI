@@ -1,9 +1,17 @@
-import Anthropic from '@anthropic-ai/sdk';
-import { BaseLLM } from '../base/BaseLLM.js';
-import type { Message, ToolDefinition, LLMResponse, LLMStreamChunk, LLMConfig, ToolCall, ContentBlock } from '../../core/types.js';
+import Anthropic from "@anthropic-ai/sdk";
+import { BaseLLM } from "../base/BaseLLM.js";
+import type {
+  Message,
+  ToolDefinition,
+  LLMResponse,
+  LLMStreamChunk,
+  LLMConfig,
+  ToolCall,
+  ContentBlock,
+} from "../../core/types.js";
 
 interface AnthropicContentBlock {
-  type: 'text' | 'image';
+  type: "text" | "image";
   text?: string;
   source?: {
     type: string;
@@ -13,7 +21,7 @@ interface AnthropicContentBlock {
 }
 
 interface AnthropicMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string | AnthropicContentBlock[];
 }
 
@@ -23,14 +31,6 @@ interface AnthropicTool {
   input_schema: object;
 }
 
-/**
- * Anthropic LLM 구현
- *
- * 최신 모델 (2026-02):
- * - claude-opus-4 (가장 강력, multimodal)
- * - claude-sonnet-4.5 (균형잡힌 성능, multimodal)
- * - claude-haiku-4.5 (빠르고 저렴, multimodal)
- */
 export class AnthropicLLM extends BaseLLM {
   private client: Anthropic;
   private history: AnthropicMessage[] = [];
@@ -38,16 +38,16 @@ export class AnthropicLLM extends BaseLLM {
   constructor(config: LLMConfig) {
     super(config);
     if (!config.apiKey) {
-      throw new Error('Anthropic API key required');
+      throw new Error("Anthropic API key required");
     }
     if (!config.model) {
-      throw new Error('Anthropic model required');
+      throw new Error("Anthropic model required");
     }
     if (config.maxTokens === undefined) {
-      throw new Error('maxTokens required');
+      throw new Error("maxTokens required");
     }
     if (config.temperature === undefined) {
-      throw new Error('temperature required');
+      throw new Error("temperature required");
     }
     this.client = new Anthropic({ apiKey: config.apiKey });
   }
@@ -56,27 +56,27 @@ export class AnthropicLLM extends BaseLLM {
 
   addUserMessage(content: string | ContentBlock[]): void {
     this.history.push({
-      role: 'user',
+      role: "user",
       content: this.convertContent(content),
     });
   }
 
   addAssistantMessage(content: string): void {
     this.history.push({
-      role: 'assistant',
+      role: "assistant",
       content,
     });
   }
 
   addToolResult(toolUseId: string, result: string): void {
     this.history.push({
-      role: 'user',
+      role: "user",
       content: [
         {
-          type: 'text',
+          type: "text",
           text: JSON.stringify({
             tool_use_id: toolUseId,
-            type: 'tool_result',
+            type: "tool_result",
             content: result,
           }),
         },
@@ -88,27 +88,24 @@ export class AnthropicLLM extends BaseLLM {
     this.history = [];
   }
 
-  isMultimodal(_modelId: string): boolean {
-    // Claude 4.x 이상 모델은 모두 multimodal 지원
-    return true;
-  }
-
   // ===== 내부 유틸리티 =====
 
-  private convertContent(content: string | ContentBlock[]): string | AnthropicContentBlock[] {
-    if (typeof content === 'string') {
+  private convertContent(
+    content: string | ContentBlock[],
+  ): string | AnthropicContentBlock[] {
+    if (typeof content === "string") {
       return content;
     }
 
     return content.map((block) => {
-      if (block.type === 'text') {
-        return { type: 'text' as const, text: block.text };
+      if (block.type === "text") {
+        return { type: "text" as const, text: block.text };
       } else {
         if (!block.source.media_type) {
-          throw new Error('Image media_type required');
+          throw new Error("Image media_type required");
         }
         return {
-          type: 'image' as const,
+          type: "image" as const,
           source: {
             type: block.source.type,
             media_type: block.source.media_type,
@@ -121,8 +118,12 @@ export class AnthropicLLM extends BaseLLM {
 
   private convertMessages(messages: Message[]): AnthropicMessage[] {
     return messages.map((msg) => ({
-      role: msg.role === 'assistant' ? ('assistant' as const) : ('user' as const),
-      content: typeof msg.content === 'string' ? msg.content : this.convertContent(msg.content),
+      role:
+        msg.role === "assistant" ? ("assistant" as const) : ("user" as const),
+      content:
+        typeof msg.content === "string"
+          ? msg.content
+          : this.convertContent(msg.content),
     }));
   }
 
@@ -139,7 +140,7 @@ export class AnthropicLLM extends BaseLLM {
   async send(tools?: ToolDefinition[]): Promise<LLMResponse> {
     const modelId = this.config.model;
     if (!modelId) {
-      throw new Error('Model ID required');
+      throw new Error("Model ID required");
     }
 
     const response = await this.client.messages.create({
@@ -151,13 +152,13 @@ export class AnthropicLLM extends BaseLLM {
     });
 
     // Extract text content
-    let textContent = '';
+    let textContent = "";
     const toolCalls: ToolCall[] = [];
 
     for (const block of response.content) {
-      if (block.type === 'text') {
+      if (block.type === "text") {
         textContent += block.text;
-      } else if (block.type === 'tool_use') {
+      } else if (block.type === "tool_use") {
         toolCalls.push({
           id: block.id,
           name: block.name,
@@ -174,7 +175,12 @@ export class AnthropicLLM extends BaseLLM {
     return {
       content: textContent,
       toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
-      stopReason: response.stop_reason === 'end_turn' ? 'end_turn' : response.stop_reason === 'tool_use' ? 'tool_use' : 'max_tokens',
+      stopReason:
+        response.stop_reason === "end_turn"
+          ? "end_turn"
+          : response.stop_reason === "tool_use"
+            ? "tool_use"
+            : "max_tokens",
       usage: {
         inputTokens: response.usage.input_tokens,
         outputTokens: response.usage.output_tokens,
@@ -182,10 +188,12 @@ export class AnthropicLLM extends BaseLLM {
     };
   }
 
-  async *stream(tools?: ToolDefinition[]): AsyncIterableIterator<LLMStreamChunk> {
+  async *stream(
+    tools?: ToolDefinition[],
+  ): AsyncIterableIterator<LLMStreamChunk> {
     const modelId = this.config.model;
     if (!modelId) {
-      throw new Error('Model ID required');
+      throw new Error("Model ID required");
     }
 
     const stream = await this.client.messages.create({
@@ -198,31 +206,37 @@ export class AnthropicLLM extends BaseLLM {
     });
 
     for await (const event of stream) {
-      if (event.type === 'content_block_delta') {
-        if (event.delta.type === 'text_delta') {
-          yield { type: 'content', content: event.delta.text };
+      if (event.type === "content_block_delta") {
+        if (event.delta.type === "text_delta") {
+          yield { type: "content", content: event.delta.text };
         }
-      } else if (event.type === 'content_block_start' && event.content_block.type === 'tool_use') {
+      } else if (
+        event.type === "content_block_start" &&
+        event.content_block.type === "tool_use"
+      ) {
         yield {
-          type: 'tool_use',
+          type: "tool_use",
           toolCall: {
             id: event.content_block.id,
             name: event.content_block.name,
             input: {},
           },
         };
-      } else if (event.type === 'message_stop') {
-        yield { type: 'done' };
+      } else if (event.type === "message_stop") {
+        yield { type: "done" };
       }
     }
   }
 
   // ===== 1회성 호출 (fast/vision 모드) =====
 
-  async sendOnce(messages: Message[], tools?: ToolDefinition[]): Promise<LLMResponse> {
+  async sendOnce(
+    messages: Message[],
+    tools?: ToolDefinition[],
+  ): Promise<LLMResponse> {
     const modelId = this.config.model;
     if (!modelId) {
-      throw new Error('Model ID required');
+      throw new Error("Model ID required");
     }
 
     const anthropicMessages = this.convertMessages(messages);
@@ -236,13 +250,13 @@ export class AnthropicLLM extends BaseLLM {
     });
 
     // Extract text content
-    let textContent = '';
+    let textContent = "";
     const toolCalls: ToolCall[] = [];
 
     for (const block of response.content) {
-      if (block.type === 'text') {
+      if (block.type === "text") {
         textContent += block.text;
-      } else if (block.type === 'tool_use') {
+      } else if (block.type === "tool_use") {
         toolCalls.push({
           id: block.id,
           name: block.name,
@@ -254,7 +268,12 @@ export class AnthropicLLM extends BaseLLM {
     return {
       content: textContent,
       toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
-      stopReason: response.stop_reason === 'end_turn' ? 'end_turn' : response.stop_reason === 'tool_use' ? 'tool_use' : 'max_tokens',
+      stopReason:
+        response.stop_reason === "end_turn"
+          ? "end_turn"
+          : response.stop_reason === "tool_use"
+            ? "tool_use"
+            : "max_tokens",
       usage: {
         inputTokens: response.usage.input_tokens,
         outputTokens: response.usage.output_tokens,

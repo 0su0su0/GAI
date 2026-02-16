@@ -52,11 +52,6 @@ export abstract class BaseLLM {
   // ===== 유틸리티 =====
 
   /**
-   * 모델이 멀티모달을 지원하는지 확인
-   */
-  abstract isMultimodal(modelId: string): boolean;
-
-  /**
    * 설정 업데이트
    */
   updateConfig(config: Partial<LLMConfig>): void {

@@ -73,12 +73,6 @@ export class OllamaLLM extends BaseLLM {
     this.history = [];
   }
 
-  isMultimodal(modelId: string): boolean {
-    // Ollama는 로컬 모델이라 정적 정의 불가
-    // Fallback: 모델 이름에 'vision' 또는 'vl' 포함 시 multimodal
-    return modelId.toLowerCase().includes('vision') || modelId.toLowerCase().includes('vl');
-  }
-
   // ===== 내부 유틸리티 =====
 
   private convertContent(content: string | ContentBlock[]): string {

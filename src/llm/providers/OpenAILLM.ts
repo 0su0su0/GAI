@@ -80,11 +80,6 @@ export class OpenAILLM extends BaseLLM {
     this.history = [];
   }
 
-  isMultimodal(modelId: string): boolean {
-    // o-series (추론 모델)는 text-only, 나머지는 multimodal
-    return !modelId.startsWith('o');
-  }
-
   // ===== 내부 유틸리티 =====
 
   private convertContent(content: string | ContentBlock[]): string | OpenAIContentBlock[] {

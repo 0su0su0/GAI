@@ -36,8 +36,8 @@ export class ConfigLoader {
   private getDefaultConfig(): Config {
     return {
       llm: {
-        provider: 'anthropic',
-        model: 'claude-sonnet-4.5',
+        provider: 'ollama',
+        model: '',
         maxTokens: 8096,
         temperature: 0.7,
       },

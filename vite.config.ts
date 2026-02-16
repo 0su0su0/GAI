@@ -9,7 +9,17 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['fs', 'path', 'url'],
+      external: [
+        'fs',
+        'path',
+        'url',
+        'os',
+        'crypto',
+        'robotjs',
+        '@cherrystudio/mac-system-ocr',
+        'node-mac-permissions',
+        'node-screenshots',
+      ],
     },
     target: 'node18',
     outDir: 'dist',

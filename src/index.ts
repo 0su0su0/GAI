@@ -4,10 +4,62 @@ import { Agent } from './core/Agent.js';
 import { ToolRegistry } from './core/ToolRegistry.js';
 import { ScreenReaderTool } from './tools/gui/ScreenReader.js';
 import { EchoTool } from './tools/gui/EchoTool.js';
+import { SmartScreenReaderTool } from './tools/gui/SmartScreenReader.js';
+import { ScreenCaptureTool } from './tools/gui/vision/ScreenCaptureTool.js';
+import { OCRTool } from './tools/gui/vision/OCRTool.js';
+import { ClickTool } from './tools/gui/action/ClickTool.js';
+import { TypeTool } from './tools/gui/action/TypeTool.js';
+import { KeyPressTool } from './tools/gui/action/KeyPressTool.js';
+import { TabNavigateTool } from './tools/gui/action/TabNavigateTool.js';
+import { MacPermissions } from './utils/permissions/MacPermissions.js';
+import { isMacOS } from './utils/platform.js';
+import { NavigationBrain } from './brain/NavigationBrain.js';
+import { JSONStorage } from './brain/storage/JSONStorage.js';
+import { NavigateToTool } from './brain/tools/NavigateToTool.js';
+import { GetCurrentNodeTool } from './brain/tools/GetCurrentNodeTool.js';
+import { LaunchAppTool } from './brain/tools/LaunchAppTool.js';
 import type { LLMConfig, LLMModeConfig } from './core/types.js';
 
 async function main() {
   console.log('🤖 GAI (Graphic Agent Interface) - Starting...\n');
+
+  // Check permissions on macOS
+  if (isMacOS()) {
+    const permissions = MacPermissions.checkAllPermissions();
+
+    if (!permissions.allGranted) {
+      console.log('⚠️  GUI automation requires permissions:\n');
+
+      if (permissions.accessibility !== 'authorized') {
+        console.log(
+          `   Accessibility: ${permissions.accessibility} (required for keyboard/mouse control)`
+        );
+      }
+
+      if (permissions.screenRecording !== 'authorized') {
+        console.log(
+          `   Screen Recording: ${permissions.screenRecording} (required for screen capture)`
+        );
+      }
+
+      console.log(
+        '\n💡 To grant permissions: System Preferences > Security & Privacy > Privacy\n'
+      );
+
+      // Request permissions
+      if (permissions.accessibility !== 'authorized') {
+        MacPermissions.requestAccessibility();
+      }
+      if (permissions.screenRecording !== 'authorized') {
+        MacPermissions.requestScreenRecording();
+      }
+
+      console.log('Please grant permissions and restart the application.\n');
+      process.exit(1);
+    }
+
+    console.log('✅ Permissions: Accessibility and Screen Recording granted\n');
+  }
 
   // Load configuration
   const configLoader = new ConfigLoader();
@@ -47,9 +99,31 @@ async function main() {
   // Initialize Tool Registry
   const toolRegistry = new ToolRegistry();
 
-  // Register tools (with LLM injection for GUI tools)
+  // Register basic tools
   toolRegistry.register(new EchoTool());
   toolRegistry.register(new ScreenReaderTool(llm));
+
+  // Register Vision tools
+  toolRegistry.register(new SmartScreenReaderTool(llmManager));
+  toolRegistry.register(new ScreenCaptureTool());
+  toolRegistry.register(new OCRTool());
+
+  // Register Action tools
+  toolRegistry.register(new ClickTool());
+  toolRegistry.register(new TypeTool());
+  toolRegistry.register(new KeyPressTool());
+  toolRegistry.register(new TabNavigateTool());
+
+  // Initialize Navigation Brain
+  const brainStorage = new JSONStorage();
+  const brain = new NavigationBrain(brainStorage, llmManager);
+  await brain.initialize();
+  console.log('✅ Navigation Brain initialized\n');
+
+  // Register Brain tools
+  toolRegistry.register(new NavigateToTool(brain));
+  toolRegistry.register(new GetCurrentNodeTool(brain));
+  toolRegistry.register(new LaunchAppTool());
 
   console.log(`✅ Registered ${toolRegistry.count()} tools:`);
   toolRegistry.getAll().forEach((tool) => {

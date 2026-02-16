@@ -37,7 +37,79 @@ export interface SmartScreenReaderInput {
   mode?: 'quick' | 'detailed';
 }
 
-export type ToolInput = ScreenReaderInput | EchoInput | SmartScreenReaderInput;
+// ===== GUI Automation Types =====
+
+export interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface OCRResult {
+  text: string;
+  confidence: number;
+  bbox?: BoundingBox;
+}
+
+export interface OCRAnalysis {
+  fullText: string;
+  elements: OCRResult[];
+  platform: 'macos' | 'windows' | 'unsupported';
+}
+
+export interface ScreenCaptureResult {
+  base64: string;
+  width: number;
+  height: number;
+  timestamp: string;
+  format: 'png' | 'jpeg';
+}
+
+// Vision Tool Inputs
+export interface CaptureScreenInput {
+  region?: BoundingBox;
+  format?: 'png' | 'jpeg';
+  includeOCR?: boolean;
+}
+
+export interface OCRInput {
+  imagePath?: string;
+  captureScreen?: boolean;
+}
+
+// Action Tool Inputs
+export interface ClickInput {
+  x?: number;
+  y?: number;
+  text?: string;
+  button?: 'left' | 'right' | 'middle';
+  doubleClick?: boolean;
+}
+
+export interface TypeTextInput {
+  text: string;
+  pressEnter?: boolean;
+  delay?: number;
+}
+
+export interface PressKeyInput {
+  key: string | string[];
+  modifiers?: Array<'command' | 'ctrl' | 'alt' | 'shift'>;
+}
+
+export interface TabNavigateInput {
+  count?: number;
+  reverse?: boolean;
+}
+
+export interface SpotlightInput {
+  query: string;
+  pressEnter?: boolean;
+}
+
+// Tool input은 다양한 구조를 가질 수 있으므로 unknown 타입 사용
+export type ToolInput = unknown;
 
 export interface ToolDefinition {
   name: string;
